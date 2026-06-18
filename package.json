@@ -1,0 +1,61 @@
+{
+  "name": "arviora-commerce",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Arviora — a category-agnostic ecommerce platform",
+  "scripts": {
+    "dev": "pnpm --parallel --filter @arviora/api --filter @arviora/web dev",
+    "dev:api": "pnpm --filter @arviora/api dev",
+    "dev:web": "pnpm --filter @arviora/web dev",
+    "build": "pnpm -r build",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:migrate": "pnpm --filter @arviora/api prisma migrate dev",
+    "db:seed": "pnpm --filter @arviora/api db:seed",
+    "db:studio": "pnpm --filter @arviora/api prisma studio",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "pnpm --filter @arviora/api exec tsc --noEmit && pnpm --filter @arviora/web exec tsc -b",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepare": "husky"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/engines",
+      "prisma",
+      "esbuild",
+      "argon2"
+    ]
+  },
+  "packageManager": "pnpm@10.34.1",
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{js,mjs,cjs,jsx,json,css,md}": [
+      "prettier --write"
+    ]
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.5.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.3",
+    "globals": "^17.6.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.7",
+    "prettier": "^3.8.4",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.61.1",
+    "vitest": "^4.1.9"
+  }
+}

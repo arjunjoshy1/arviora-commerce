@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Arviora — Palette Preview</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Inter, system-ui, sans-serif; background: #e9e9ea; color: #111; padding: 40px 24px; }
+  h1 { font-size: 28px; margin-bottom: 6px; }
+  .sub { color: #555; margin-bottom: 32px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 28px; max-width: 1200px; margin: 0 auto; }
+  .palette { border-radius: 18px; overflow: hidden; box-shadow: 0 8px 30px rgba(0,0,0,.08); }
+  .pal-head { padding: 18px 20px; display: flex; align-items: center; justify-content: space-between; }
+  .pal-name { font-size: 18px; font-weight: 700; }
+  .pal-tag { font-size: 12px; opacity: .6; }
+  .swatches { display: flex; gap: 8px; padding: 0 20px 14px; }
+  .sw { flex: 1; height: 36px; border-radius: 8px; display: flex; align-items: flex-end; justify-content: center; font-size: 9px; padding-bottom: 3px; }
+  .mock { padding: 20px; }
+  .pills { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .pill { font-size: 12px; padding: 6px 14px; border-radius: 999px; }
+  .pill.active { color: #fff; }
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .card { border-radius: 14px; overflow: hidden; }
+  .card .img { height: 96px; background-size: cover; background-position: center; }
+  .card .body { padding: 10px 12px; }
+  .cat { font-size: 9px; text-transform: uppercase; letter-spacing: .08em; opacity: .55; }
+  .pname { font-size: 13px; font-weight: 500; margin: 3px 0 6px; }
+  .price { font-size: 14px; font-weight: 700; }
+  .btn { margin-top: 14px; width: 100%; padding: 11px; border: none; border-radius: 10px; color: #fff; font-weight: 600; font-size: 13px; cursor: pointer; }
+</style>
+</head>
+<body>
+  <h1>Arviora — Color Themes</h1>
+  <p class="sub">Each is one warm background + one dark text + one accent. Tell me which number you like.</p>
+  <div class="grid" id="grid"></div>
+
+<script>
+const palettes = [
+  { id: 1, name: "Porcelain & Charcoal", tag: "Pure minimal · monochrome",
+    bg:"#F4F4F2", surface:"#FFFFFF", ink:"#1C1C1A", accent:"#2E2E2B", muted:"#8A8A85", onAccent:"#FFFFFF", cardText:"#1C1C1A" },
+  { id: 2, name: "Mist & Slate Blue", tag: "Cool · quiet sophistication",
+    bg:"#F1F3F4", surface:"#FFFFFF", ink:"#1E2329", accent:"#46637A", muted:"#7C868F", onAccent:"#FFFFFF", cardText:"#1E2329" },
+  { id: 3, name: "Bone & Dusty Rose", tag: "Soft · elegant warmth",
+    bg:"#F4F0EC", surface:"#FFFFFF", ink:"#26211F", accent:"#A6786E", muted:"#8C8079", onAccent:"#FFFFFF", cardText:"#26211F" },
+  { id: 4, name: "Fog & Muted Teal", tag: "Calm · understated",
+    bg:"#EFF1F0", surface:"#FFFFFF", ink:"#1D2422", accent:"#3E6E66", muted:"#79847F", onAccent:"#FFFFFF", cardText:"#1D2422" },
+  { id: 5, name: "Stone & Deep Navy", tag: "Refined · classic",
+    bg:"#F2F1EE", surface:"#FFFFFF", ink:"#1A1D24", accent:"#2A3144", muted:"#85847F", onAccent:"#FFFFFF", cardText:"#1A1D24" },
+  { id: 6, name: "Pearl & Taupe", tag: "Neutral · gallery-quiet",
+    bg:"#F3F1ED", surface:"#FFFFFF", ink:"#23201C", accent:"#7C7065", muted:"#928B81", onAccent:"#FFFFFF", cardText:"#23201C" },
+];
+
+const img1 = "https://picsum.photos/seed/jhumka/300/300";
+const img2 = "https://picsum.photos/seed/kurta/300/300";
+
+document.getElementById('grid').innerHTML = palettes.map(p => `
+  <div class="palette" style="background:${p.bg}; color:${p.ink}">
+    <div class="pal-head">
+      <span class="pal-name">${p.id}. ${p.name}</span>
+      <span class="pal-tag">${p.tag}</span>
+    </div>
+    <div class="swatches">
+      <div class="sw" style="background:${p.bg}; color:${p.ink}; border:1px solid rgba(0,0,0,.08)">bg</div>
+      <div class="sw" style="background:${p.surface}; color:${p.ink}; border:1px solid rgba(0,0,0,.08)">surface</div>
+      <div class="sw" style="background:${p.ink}; color:#fff">ink</div>
+      <div class="sw" style="background:${p.accent}; color:#fff">accent</div>
+      <div class="sw" style="background:${p.muted}; color:#fff">muted</div>
+    </div>
+    <div class="mock">
+      <div class="pills">
+        <span class="pill active" style="background:${p.accent}; color:${p.onAccent}">All</span>
+        <span class="pill" style="background:${p.surface}; color:${p.muted}; border:1px solid rgba(125,125,125,.25)">Jewellery</span>
+        <span class="pill" style="background:${p.surface}; color:${p.muted}; border:1px solid rgba(125,125,125,.25)">Clothing</span>
+      </div>
+      <div class="cards">
+        <div class="card" style="background:${p.surface}; color:${p.cardText}; box-shadow:0 1px 0 rgba(0,0,0,.05), 0 0 0 1px rgba(125,125,125,.18)">
+          <div class="img" style="background-image:url(${img1})"></div>
+          <div class="body">
+            <div class="cat" style="color:${p.muted}">Jewellery</div>
+            <div class="pname">Oxidised Silver Jhumkas</div>
+            <div class="price" style="color:${p.accent}">₹899.00</div>
+          </div>
+        </div>
+        <div class="card" style="background:${p.surface}; color:${p.cardText}; box-shadow:0 1px 0 rgba(0,0,0,.05), 0 0 0 1px rgba(125,125,125,.18)">
+          <div class="img" style="background-image:url(${img2})"></div>
+          <div class="body">
+            <div class="cat" style="color:${p.muted}">Clothing</div>
+            <div class="pname">Hand-block Cotton Kurta</div>
+            <div class="price" style="color:${p.accent}">₹1,299.00</div>
+          </div>
+        </div>
+      </div>
+      <button class="btn" style="background:${p.accent}; color:${p.onAccent}">Add to cart</button>
+    </div>
+  </div>
+`).join('');
+</script>
+</body>
+</html>
