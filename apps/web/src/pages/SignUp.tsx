@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Logo from '../components/Logo';
 import EyeIcon from '../components/EyeIcon';
 import Spinner from '../components/Spinner';
-import { useAuth } from '../auth/AuthContext';
+import { useAuth } from '../auth/useAuth';
 import { useToast } from '../components/Toast';
 
 export default function SignUp() {

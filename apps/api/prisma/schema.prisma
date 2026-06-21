@@ -35,6 +35,7 @@ model User {
 
   refreshTokens       RefreshToken[]
   passwordResetTokens PasswordResetToken[]
+  orders              Order[]
 }
 
 model RefreshToken {
@@ -86,8 +87,62 @@ model Product {
   categoryId String
   category   Category @relation(fields: [categoryId], references: [id])
 
+  orderItems OrderItem[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([categoryId])
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+model Order {
+  id     String      @id @default(cuid())
+  userId String
+  user   User        @relation(fields: [userId], references: [id])
+  status OrderStatus @default(PENDING)
+
+  // Totals are snapshotted in paise at purchase time.
+  subtotalInPaise Int
+  currency        String @default("INR")
+
+  // Shipping address snapshot (so it never changes if the user edits later).
+  shippingName       String
+  shippingPhone      String
+  shippingLine1      String
+  shippingLine2      String?
+  shippingCity       String
+  shippingState      String
+  shippingPostalCode String
+
+  items OrderItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model OrderItem {
+  id      String @id @default(cuid())
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  // Snapshot of the product at purchase time (name/price can change later).
+  name         String
+  priceInPaise Int
+  size         String
+  quantity     Int
+
+  @@index([orderId])
 }

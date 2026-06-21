@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import type { Category } from '@arviora/shared';
 import Logo from './Logo';
-import { useAuth } from '../auth/AuthContext';
+import { useAuth } from '../auth/useAuth';
 import { useToast } from './Toast';
 
 type SidebarProps = {

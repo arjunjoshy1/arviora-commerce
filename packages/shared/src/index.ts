@@ -54,6 +54,50 @@ export interface Paginated<T> {
   pageSize: number;
 }
 
+export type OrderStatus =
+  | 'PENDING'
+  | 'PAID'
+  | 'SHIPPED'
+  | 'DELIVERED'
+  | 'CANCELLED';
+
+/** A shipping address captured at checkout. */
+export interface ShippingAddress {
+  name: string;
+  phone: string;
+  line1: string;
+  line2?: string;
+  city: string;
+  state: string;
+  postalCode: string;
+}
+
+export interface OrderItem {
+  id: string;
+  productId: string;
+  /** Snapshot of the product name + price at purchase time. */
+  name: string;
+  priceInPaise: number;
+  size: string;
+  quantity: number;
+}
+
+export interface Order {
+  id: string;
+  status: OrderStatus;
+  subtotalInPaise: number;
+  currency: string;
+  shipping: ShippingAddress;
+  items: OrderItem[];
+  createdAt: string;
+}
+
+/** Body for POST /orders — what the client sends to place an order. */
+export interface PlaceOrderRequest {
+  items: { productId: string; size: string; quantity: number }[];
+  shipping: ShippingAddress;
+}
+
 /** Convert a paise integer into a display string like "₹1,299.00". */
 export function formatPrice(priceInPaise: number, currency = 'INR'): string {
   return new Intl.NumberFormat('en-IN', {

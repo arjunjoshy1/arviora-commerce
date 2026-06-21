@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Home from './pages/Home';
+import CartDrawer from './components/CartDrawer';
+import Home from './pages/home/Home';
 import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
 import ForgotPassword from './pages/ForgotPassword';
@@ -17,6 +18,8 @@ export default function App() {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/product/:slug" element={<ProductDetail />} />
       </Routes>
+      {/* Global cart drawer — available on every page. */}
+      <CartDrawer />
     </BrowserRouter>
   );
 }

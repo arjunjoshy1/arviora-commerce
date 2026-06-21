@@ -4,6 +4,9 @@ import { Link, useParams } from 'react-router-dom';
 import { formatPrice } from '@arviora/shared';
 import { fetchProduct } from '../api';
 import Logo from '../components/Logo';
+import CartButton from '../components/CartButton';
+import { useCart } from '../cart/useCart';
+import { useToast } from '../components/Toast';
 
 const SIZES = ['XS', 'S', 'M', 'L', 'XL'];
 
@@ -11,6 +14,9 @@ export default function ProductDetail() {
   const { slug = '' } = useParams();
   const [size, setSize] = useState<string | null>(null);
   const [qty, setQty] = useState(1);
+
+  const { addItem, openCart } = useCart();
+  const toast = useToast();
 
   const {
     data: product,
@@ -21,6 +27,13 @@ export default function ProductDetail() {
     queryFn: () => fetchProduct(slug),
   });
 
+  const handleAddToCart = () => {
+    if (!product || !size) return;
+    addItem(product, size, qty);
+    toast(`Added ${product.name} (${size}) to cart`, 'success');
+    openCart();
+  };
+
   return (
     <div className="min-h-screen">
       {/* Slim header */}
@@ -29,12 +42,15 @@ export default function ProductDetail() {
           <Link to="/">
             <Logo />
           </Link>
-          <Link
-            to="/"
-            className="text-sm text-muted underline-offset-2 hover:text-ink hover:underline"
-          >
-            ← Back to shop
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link
+              to="/"
+              className="text-sm text-muted underline-offset-2 hover:text-ink hover:underline"
+            >
+              ← Back to shop
+            </Link>
+            <CartButton />
+          </div>
         </div>
       </header>
 
@@ -120,6 +136,7 @@ export default function ProductDetail() {
                   <QtyButton
                     onClick={() => setQty((q) => Math.max(1, q - 1))}
                     label="Decrease quantity"
+                    disabled={qty <= 1}
                   >
                     −
                   </QtyButton>
@@ -131,6 +148,7 @@ export default function ProductDetail() {
                       setQty((q) => Math.min(product.stock, q + 1))
                     }
                     label="Increase quantity"
+                    disabled={qty >= product.stock}
                   >
                     +
                   </QtyButton>
@@ -143,6 +161,7 @@ export default function ProductDetail() {
               {/* Actions */}
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <button
+                  onClick={handleAddToCart}
                   disabled={!size}
                   className="flex-1 rounded-xl bg-accent py-3.5 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
                 >
@@ -170,17 +189,20 @@ export default function ProductDetail() {
 function QtyButton({
   onClick,
   label,
+  disabled = false,
   children,
 }: {
   onClick: () => void;
   label: string;
+  disabled?: boolean;
   children: React.ReactNode;
 }) {
   return (
     <button
       onClick={onClick}
       aria-label={label}
-      className="grid h-10 w-10 place-items-center text-lg text-muted transition hover:text-ink"
+      disabled={disabled}
+      className="grid h-10 w-10 place-items-center text-lg text-muted transition hover:text-ink disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:text-muted"
     >
       {children}
     </button>
