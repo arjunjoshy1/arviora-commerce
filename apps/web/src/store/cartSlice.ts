@@ -1,19 +1,9 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import type { Product } from '@arviora/shared';
+import type { CartLine, Product } from '@arviora/shared';
 import type { RootState } from './store';
 
 /** A single line in the cart — a product snapshot at a chosen size. */
-export interface CartItem {
-  productId: string;
-  slug: string;
-  name: string;
-  imageUrl: string | null;
-  priceInPaise: number;
-  currency: string;
-  color: string | null;
-  size: string;
-  quantity: number;
-}
+export type CartItem = CartLine;
 
 interface CartState {
   items: CartItem[];
@@ -86,6 +76,11 @@ const cartSlice = createSlice({
       state.items = [];
     },
 
+    /** Replace the cart wholesale — used to load/merge the DB cart on login. */
+    setItems: (state, action: PayloadAction<CartItem[]>) => {
+      state.items = action.payload;
+    },
+
     openCart: (state) => {
       state.isOpen = true;
     },
@@ -100,6 +95,7 @@ export const {
   updateQuantity,
   removeItem,
   clear,
+  setItems,
   openCart,
   closeCart,
 } = cartSlice.actions;

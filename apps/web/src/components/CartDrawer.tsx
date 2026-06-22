@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { formatPrice } from '@arviora/shared';
 import { useCart } from '../cart/useCart';
 
@@ -16,6 +16,12 @@ export default function CartDrawer() {
     updateQuantity,
     removeItem,
   } = useCart();
+  const navigate = useNavigate();
+
+  const goToCheckout = () => {
+    closeCart();
+    navigate('/checkout');
+  };
 
   return (
     <>
@@ -165,7 +171,7 @@ export default function CartDrawer() {
               </p>
               <button
                 className="w-full rounded-xl bg-accent py-3 text-sm font-semibold text-white transition hover:opacity-90"
-                onClick={() => alert('Checkout is coming next!')}
+                onClick={goToCheckout}
               >
                 Checkout
               </button>

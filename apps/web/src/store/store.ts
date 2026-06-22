@@ -1,6 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import cartReducer, { type CartItem } from './cartSlice';
 import authReducer from './authSlice';
+import uiReducer from './uiSlice';
 
 const CART_STORAGE_KEY = 'arviora_cart_v1';
 
@@ -18,6 +19,7 @@ export const store = configureStore({
   reducer: {
     cart: cartReducer,
     auth: authReducer,
+    ui: uiReducer,
   },
   preloadedState: {
     cart: { items: loadCartItems(), isOpen: false },

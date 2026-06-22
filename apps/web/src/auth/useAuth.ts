@@ -23,5 +23,12 @@ export function useAuth() {
     register: (name: string, email: string, password: string): Promise<User> =>
       dispatch(auth.register({ name, email, password })).unwrap(),
     logout: () => dispatch(auth.logout()).unwrap(),
+    updateProfile: (name: string): Promise<User> =>
+      dispatch(auth.updateProfile({ name })).unwrap(),
+    changePassword: (
+      currentPassword: string,
+      newPassword: string,
+    ): Promise<void> =>
+      dispatch(auth.changePassword({ currentPassword, newPassword })).unwrap(),
   };
 }

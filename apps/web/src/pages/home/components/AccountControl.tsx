@@ -33,7 +33,7 @@ const AccountControl = () => {
 
   return (
     <div className="ml-auto flex items-center gap-2 sm:ml-0">
-      <span className="hidden items-center gap-2 sm:flex">
+      <Link to="/account" className="hidden items-center gap-2 sm:flex">
         <span className="grid h-8 w-8 place-items-center rounded-full bg-accent text-xs font-semibold text-white">
           {initial}
         </span>
@@ -45,7 +45,7 @@ const AccountControl = () => {
             </span>
           )}
         </span>
-      </span>
+      </Link>
       <button
         onClick={handleLogout}
         className="rounded-full px-3 py-2 text-sm font-medium text-muted transition hover:text-ink"

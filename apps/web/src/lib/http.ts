@@ -81,6 +81,8 @@ export async function apiFetch<T>(
   if (!res.ok) {
     throw new ApiError(await extractError(res), res.status);
   }
-  if (res.status === 204) return undefined as T;
-  return res.json() as Promise<T>;
+  // Some endpoints (e.g. cart/wishlist mutations) return 200/204 with no
+  // body — parsing those as JSON would throw, so check for content first.
+  const text = await res.text();
+  return (text ? JSON.parse(text) : undefined) as T;
 }

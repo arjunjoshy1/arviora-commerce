@@ -53,6 +53,13 @@ export class UsersService {
     });
   }
 
+  updateName(userId: string, name: string): Promise<User> {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { name: name.trim() },
+    });
+  }
+
   markLoggedIn(userId: string): Promise<User> {
     return this.prisma.user.update({
       where: { id: userId },

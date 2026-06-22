@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Logo from '../components/Logo';
 import EyeIcon from '../components/EyeIcon';
 import Spinner from '../components/Spinner';
@@ -15,6 +15,9 @@ export default function SignIn() {
   const { login } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
+  // Where to go after login — back to the gated page, or home.
+  const from = (location.state as { from?: string } | null)?.from ?? '/';
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -23,7 +26,7 @@ export default function SignIn() {
     try {
       const user = await login(email, password);
       toast(`Welcome back, ${user.name.split(' ')[0]}!`, 'success');
-      navigate('/');
+      navigate(from, { replace: true });
     } catch (err) {
       toast(err instanceof Error ? err.message : 'Sign in failed', 'error');
     } finally {

@@ -51,7 +51,9 @@ export default function Sidebar({
       >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-line px-5 py-4">
-          <Logo />
+          <Link to="/" onClick={onClose} aria-label="Arviora home">
+            <Logo />
+          </Link>
           <button
             onClick={onClose}
             aria-label="Close menu"

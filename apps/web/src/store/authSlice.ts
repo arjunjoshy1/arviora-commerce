@@ -53,6 +53,33 @@ export const logout = createAsyncThunk('auth/logout', async () => {
   await authApi.logout();
 });
 
+export const updateProfile = createAsyncThunk<
+  User,
+  { name: string },
+  { rejectValue: string }
+>('auth/updateProfile', async ({ name }, { rejectWithValue }) => {
+  try {
+    return await authApi.updateProfile(name);
+  } catch (err) {
+    return rejectWithValue(errorMessage(err, 'Could not update profile'));
+  }
+});
+
+export const changePassword = createAsyncThunk<
+  void,
+  { currentPassword: string; newPassword: string },
+  { rejectValue: string }
+>(
+  'auth/changePassword',
+  async ({ currentPassword, newPassword }, { rejectWithValue }) => {
+    try {
+      await authApi.changePassword(currentPassword, newPassword);
+    } catch (err) {
+      return rejectWithValue(errorMessage(err, 'Could not change password'));
+    }
+  },
+);
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -71,6 +98,9 @@ const authSlice = createSlice({
         state.user = action.payload;
       })
       .addCase(register.fulfilled, (state, action) => {
+        state.user = action.payload;
+      })
+      .addCase(updateProfile.fulfilled, (state, action) => {
         state.user = action.payload;
       })
       .addCase(logout.fulfilled, (state) => {

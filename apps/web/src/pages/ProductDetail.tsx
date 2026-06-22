@@ -3,9 +3,12 @@ import { useQuery } from '@tanstack/react-query';
 import { Link, useParams } from 'react-router-dom';
 import { formatPrice } from '@arviora/shared';
 import { fetchProduct } from '../api';
-import Logo from '../components/Logo';
+import TopBar from '../components/TopBar';
 import CartButton from '../components/CartButton';
+import AuthPromptModal from '../components/AuthPromptModal';
+import HeartIcon from '../components/icons/HeartIcon';
 import { useCart } from '../cart/useCart';
+import { useWishlist } from '../wishlist/useWishlist';
 import { useToast } from '../components/Toast';
 
 const SIZES = ['XS', 'S', 'M', 'L', 'XL'];
@@ -16,6 +19,13 @@ export default function ProductDetail() {
   const [qty, setQty] = useState(1);
 
   const { addItem, openCart } = useCart();
+  const {
+    isWishlisted,
+    toggle: toggleWishlist,
+    pendingProduct,
+    dismissAuthPrompt,
+    resumePendingToggle,
+  } = useWishlist();
   const toast = useToast();
 
   const {
@@ -36,23 +46,15 @@ export default function ProductDetail() {
 
   return (
     <div className="min-h-screen">
-      {/* Slim header */}
-      <header className="sticky top-0 z-20 border-b border-line bg-canvas/80 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <Link to="/">
-            <Logo />
-          </Link>
-          <div className="flex items-center gap-4">
-            <Link
-              to="/"
-              className="text-sm text-muted underline-offset-2 hover:text-ink hover:underline"
-            >
-              ← Back to shop
-            </Link>
-            <CartButton />
-          </div>
-        </div>
-      </header>
+      <TopBar>
+        <Link
+          to="/"
+          className="text-sm text-muted underline-offset-2 hover:text-ink hover:underline"
+        >
+          ← Back to shop
+        </Link>
+        <CartButton />
+      </TopBar>
 
       <main className="mx-auto max-w-6xl px-6 py-10">
         {isLoading && <p className="text-muted">Loading…</p>}
@@ -167,8 +169,17 @@ export default function ProductDetail() {
                 >
                   {size ? 'Add to cart' : 'Select a size'}
                 </button>
-                <button className="rounded-xl bg-surface px-6 py-3.5 text-sm font-medium ring-1 ring-line transition hover:ring-ink/30">
-                  ♡ Wishlist
+                <button
+                  onClick={() => toggleWishlist(product)}
+                  aria-pressed={isWishlisted(product.id)}
+                  className={`flex items-center gap-2 rounded-xl px-6 py-3.5 text-sm font-medium ring-1 transition ${
+                    isWishlisted(product.id)
+                      ? 'bg-surface text-accent ring-accent/40'
+                      : 'bg-surface ring-line hover:ring-ink/30'
+                  }`}
+                >
+                  <HeartIcon filled={isWishlisted(product.id)} />
+                  {isWishlisted(product.id) ? 'Wishlisted' : 'Wishlist'}
                 </button>
               </div>
 
@@ -182,6 +193,13 @@ export default function ProductDetail() {
           </div>
         )}
       </main>
+
+      <AuthPromptModal
+        open={!!pendingProduct}
+        message="Sign in to save this to your wishlist"
+        onClose={dismissAuthPrompt}
+        onSignedIn={resumePendingToggle}
+      />
     </div>
   );
 }

@@ -70,6 +70,30 @@ export class AuthService {
     return this.issueSession(user);
   }
 
+  async updateProfile(userId: string, name: string) {
+    const user = await this.users.updateName(userId, name);
+    return toPublicUser(user);
+  }
+
+  async changePassword(
+    userId: string,
+    currentPassword: string,
+    newPassword: string,
+  ): Promise<void> {
+    const user = await this.users.findById(userId);
+    const valid =
+      user && (await argon2.verify(user.passwordHash, currentPassword));
+    if (!user || !valid) {
+      throw new UnauthorizedException('Current password is incorrect');
+    }
+    const passwordHash = await argon2.hash(newPassword, {
+      type: argon2.argon2id,
+    });
+    await this.users.updatePassword(user.id, passwordHash);
+    // Force re-login everywhere else after a password change.
+    await this.tokens.revokeAllForUser(user.id);
+  }
+
   async refresh(rawToken: string | undefined) {
     if (!rawToken) throw new UnauthorizedException('Missing refresh token');
     const { user, refreshToken } =

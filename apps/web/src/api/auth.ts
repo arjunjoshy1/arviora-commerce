@@ -55,6 +55,23 @@ export function getMe(): Promise<User> {
   return apiFetch<User>('/auth/me');
 }
 
+export function updateProfile(name: string): Promise<User> {
+  return apiFetch<User>('/auth/me', {
+    method: 'PATCH',
+    body: JSON.stringify({ name }),
+  });
+}
+
+export function changePassword(
+  currentPassword: string,
+  newPassword: string,
+): Promise<{ success: boolean }> {
+  return apiFetch('/auth/change-password', {
+    method: 'POST',
+    body: JSON.stringify({ currentPassword, newPassword }),
+  });
+}
+
 /** Silent session restore on app load. Returns the session or null. */
 export async function refreshSession(): Promise<AuthResponse | null> {
   try {

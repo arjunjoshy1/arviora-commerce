@@ -98,6 +98,40 @@ export interface PlaceOrderRequest {
   shipping: ShippingAddress;
 }
 
+/** A wishlisted product, as returned by the wishlist API. */
+export interface WishlistItem {
+  id: string;
+  product: Product;
+  createdAt: string;
+}
+
+/** A saved address in the user's address book. */
+export interface Address {
+  id: string;
+  label: string;
+  name: string;
+  phone: string;
+  line1: string;
+  line2: string | null;
+  city: string;
+  state: string;
+  postalCode: string;
+  isDefault: boolean;
+}
+
+/** A cart line, as stored server-side for a signed-in user. */
+export interface CartLine {
+  productId: string;
+  slug: string;
+  name: string;
+  imageUrl: string | null;
+  priceInPaise: number;
+  currency: string;
+  color: string | null;
+  size: string;
+  quantity: number;
+}
+
 /** Convert a paise integer into a display string like "₹1,299.00". */
 export function formatPrice(priceInPaise: number, currency = 'INR'): string {
   return new Intl.NumberFormat('en-IN', {
