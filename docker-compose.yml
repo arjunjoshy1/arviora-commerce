@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: arviora-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: arviora
+      POSTGRES_PASSWORD: arviora
+      POSTGRES_DB: arviora
+    ports:
+      - '5432:5432'
+    volumes:
+      - arviora-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U arviora -d arviora']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  arviora-pgdata:
