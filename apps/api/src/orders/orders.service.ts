@@ -8,8 +8,12 @@ import { Order, OrderItem, Prisma, Role, User } from '@prisma/client';
 import type { Order as ApiOrder } from '@arviora/shared';
 import { PrismaService } from '../prisma/prisma.service';
 import { PlaceOrderDto } from './dto/place-order.dto';
+import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 
 type OrderWithItems = Order & { items: OrderItem[] };
+type OrderWithItemsAndUser = OrderWithItems & {
+  user: { name: string; email: string };
+};
 
 @Injectable()
 export class OrdersService {
@@ -100,10 +104,34 @@ export class OrdersService {
     }
     return toApiOrder(order);
   }
+
+  /** Admin: every order across all users, newest first. */
+  async findAllAdmin(): Promise<ApiOrder[]> {
+    const orders = await this.prisma.order.findMany({
+      include: { items: true, user: { select: { name: true, email: true } } },
+      orderBy: { createdAt: 'desc' },
+    });
+    return orders.map(toApiOrder);
+  }
+
+  /** Admin: move an order to a new status. */
+  async updateStatus(id: string, dto: UpdateOrderStatusDto): Promise<ApiOrder> {
+    const existing = await this.prisma.order.findUnique({ where: { id } });
+    if (!existing) throw new NotFoundException('Order not found');
+
+    const order = await this.prisma.order.update({
+      where: { id },
+      data: { status: dto.status },
+      include: { items: true, user: { select: { name: true, email: true } } },
+    });
+    return toApiOrder(order);
+  }
 }
 
 /** Map a Prisma order row to the shared API shape. */
-export function toApiOrder(order: OrderWithItems): ApiOrder {
+export function toApiOrder(
+  order: OrderWithItems | OrderWithItemsAndUser,
+): ApiOrder {
   return {
     id: order.id,
     status: order.status,
@@ -127,5 +155,8 @@ export function toApiOrder(order: OrderWithItems): ApiOrder {
       quantity: i.quantity,
     })),
     createdAt: order.createdAt.toISOString(),
+    ...('user' in order
+      ? { userName: order.user.name, userEmail: order.user.email }
+      : {}),
   };
 }

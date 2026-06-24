@@ -6,8 +6,10 @@ import { OrdersModule } from './orders/orders.module';
 import { WishlistModule } from './wishlist/wishlist.module';
 import { CartModule } from './cart/cart.module';
 import { AddressesModule } from './addresses/addresses.module';
+import { SupportModule } from './support/support.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { AdminModule } from './admin/admin.module';
 import { HealthController } from './health.controller';
 
 @Module({
@@ -22,6 +24,8 @@ import { HealthController } from './health.controller';
     WishlistModule,
     CartModule,
     AddressesModule,
+    SupportModule,
+    AdminModule,
   ],
   controllers: [HealthController],
 })

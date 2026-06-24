@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../auth/useAuth';
 import { useToast } from '../../components/Toast';
 import TopBar from '../../components/TopBar';
@@ -8,20 +8,25 @@ import ProfileSection from './components/ProfileSection';
 import AddressBook from './components/AddressBook';
 import PaymentMethods from './components/PaymentMethods';
 import SecuritySection from './components/SecuritySection';
+import SupportSection from './components/SupportSection';
 
-type Tab = 'profile' | 'addresses' | 'payment' | 'security';
+type Tab = 'profile' | 'addresses' | 'payment' | 'security' | 'support';
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'profile', label: 'Profile' },
   { id: 'addresses', label: 'Addresses' },
   { id: 'payment', label: 'Payment methods' },
   { id: 'security', label: 'Password' },
+  { id: 'support', label: 'Support' },
 ];
 
 const Account = () => {
   const { user, logout } = useAuth();
   const toast = useToast();
-  const [tab, setTab] = useState<Tab>('profile');
+  const [searchParams] = useSearchParams();
+  const tabFromUrl = searchParams.get('tab') as Tab | null;
+  const orderIdFromUrl = searchParams.get('orderId') ?? undefined;
+  const [tab, setTab] = useState<Tab>(tabFromUrl ?? 'profile');
 
   if (!user) return null;
 
@@ -88,7 +93,7 @@ const Account = () => {
 
             <button
               onClick={handleLogout}
-              className="w-full rounded-full px-5 py-2.5 text-sm font-medium text-muted ring-1 ring-line transition hover:text-ink"
+              className="w-full rounded-full bg-surface px-5 py-2.5 text-sm font-medium text-muted ring-1 ring-line transition hover:text-ink"
             >
               Sign out
             </button>
@@ -99,6 +104,9 @@ const Account = () => {
             {tab === 'addresses' && <AddressBook />}
             {tab === 'payment' && <PaymentMethods />}
             {tab === 'security' && <SecuritySection />}
+            {tab === 'support' && (
+              <SupportSection presetOrderId={orderIdFromUrl} />
+            )}
           </div>
         </div>
       </main>

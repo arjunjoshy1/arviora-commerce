@@ -10,6 +10,7 @@ import HeartIcon from '../components/icons/HeartIcon';
 import { useCart } from '../cart/useCart';
 import { useWishlist } from '../wishlist/useWishlist';
 import { useToast } from '../components/Toast';
+import ProductGallery from './product/components/ProductGallery';
 
 const SIZES = ['XS', 'S', 'M', 'L', 'XL'];
 
@@ -63,17 +64,16 @@ export default function ProductDetail() {
         {product && (
           <div className="grid gap-10 lg:grid-cols-2">
             {/* Image */}
-            <div className="overflow-hidden rounded-3xl bg-surface ring-1 ring-line">
-              <div className="aspect-square">
-                {product.imageUrl && (
-                  <img
-                    src={product.imageUrl}
-                    alt={product.name}
-                    className="h-full w-full object-cover"
-                  />
-                )}
-              </div>
-            </div>
+            <ProductGallery
+              images={
+                product.images.length > 0
+                  ? product.images
+                  : product.imageUrl
+                    ? [product.imageUrl]
+                    : []
+              }
+              alt={product.name}
+            />
 
             {/* Details */}
             <div className="lg:py-2">

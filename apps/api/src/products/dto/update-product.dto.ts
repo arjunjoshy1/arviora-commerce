@@ -1,5 +1,6 @@
 import {
   IsArray,
+  IsBoolean,
   IsHexColor,
   IsInt,
   IsOptional,
@@ -9,29 +10,30 @@ import {
   MinLength,
 } from 'class-validator';
 
-/** Body for POST /api/products (admin only). */
-export class CreateProductDto {
+/** Body for PATCH /api/products/admin/:id (admin only). All fields optional. */
+export class UpdateProductDto {
+  @IsOptional()
   @IsString()
   @MinLength(2)
-  name!: string;
-
-  @IsString()
-  description = '';
-
-  /** Price in paise (integer) — e.g. ₹1,299.00 = 129900. */
-  @IsInt()
-  @Min(0)
-  priceInPaise!: number;
+  name?: string;
 
   @IsOptional()
   @IsString()
-  currency = 'INR';
+  description?: string;
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  priceInPaise?: number;
+
+  @IsOptional()
+  @IsString()
+  currency?: string;
 
   @IsOptional()
   @IsUrl({ require_tld: false })
   imageUrl?: string;
 
-  /** Full image gallery for the product detail carousel. */
   @IsOptional()
   @IsArray()
   @IsUrl({ require_tld: false }, { each: true })
@@ -41,11 +43,16 @@ export class CreateProductDto {
   @IsHexColor()
   color?: string;
 
+  @IsOptional()
   @IsInt()
   @Min(0)
-  stock = 0;
+  stock?: number;
 
-  /** Category to attach the product to. */
+  @IsOptional()
   @IsString()
-  categorySlug!: string;
+  categorySlug?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  isActive?: boolean;
 }

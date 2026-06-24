@@ -8,7 +8,14 @@ const prisma = new PrismaClient();
  * Re-running is safe: we clear products and non-clothing categories first.
  */
 async function main() {
-  // Keep the catalogue clothing-only: remove everything else.
+  // Keep the catalogue clothing-only: remove everything else. Orders/tickets
+  // reference products, so dev/test data referencing the old catalogue must
+  // go first.
+  await prisma.supportTicket.deleteMany({});
+  await prisma.orderItem.deleteMany({});
+  await prisma.order.deleteMany({});
+  await prisma.cartItem.deleteMany({});
+  await prisma.wishlistItem.deleteMany({});
   await prisma.product.deleteMany({});
   await prisma.category.deleteMany({ where: { slug: { not: 'clothing' } } });
 
@@ -18,9 +25,16 @@ async function main() {
     create: { name: 'Clothing', slug: 'clothing' },
   });
 
-  // Keyword-matched stock photos (locked so each product keeps one image).
+  // Keyword-matched stock photos (locked so each product keeps the same set).
   const img = (keyword: string, lock: number) =>
     `https://loremflickr.com/600/600/${keyword}?lock=${lock}`;
+  // Three angles per product, sharing a base lock so they stay consistent
+  // across reseeds but differ enough to look like a real gallery.
+  const gallery = (keyword: string, base: number) => [
+    img(keyword, base),
+    img(keyword, base + 100),
+    img(keyword, base + 200),
+  ];
 
   const products = [
     {
@@ -30,7 +44,7 @@ async function main() {
       priceInPaise: 119900,
       color: '#C0392B', // red
       stock: 40,
-      imageUrl: img('kurta', 11),
+      images: gallery('kurta', 11),
     },
     {
       name: 'Hand-block Print Kurta',
@@ -39,7 +53,7 @@ async function main() {
       priceInPaise: 129900,
       color: '#2C3E50', // indigo
       stock: 25,
-      imageUrl: img('kurta', 12),
+      images: gallery('kurta', 12),
     },
     {
       name: 'Chikankari Anarkali Dress',
@@ -49,7 +63,7 @@ async function main() {
       priceInPaise: 289900,
       color: '#F5F0E1', // ivory
       stock: 20,
-      imageUrl: img('dress', 13),
+      images: gallery('dress', 13),
     },
     {
       name: 'Handloom Cotton Saree',
@@ -58,7 +72,7 @@ async function main() {
       priceInPaise: 219900,
       color: '#27AE60', // green
       stock: 28,
-      imageUrl: img('saree', 14),
+      images: gallery('saree', 14),
     },
     {
       name: 'Linen Button-down Shirt',
@@ -67,7 +81,7 @@ async function main() {
       priceInPaise: 169900,
       color: '#5DADE2', // sky blue
       stock: 35,
-      imageUrl: img('linen,shirt', 15),
+      images: gallery('linen,shirt', 15),
     },
     {
       name: 'Merino Wool Sweater',
@@ -77,7 +91,7 @@ async function main() {
       priceInPaise: 249900,
       color: '#7D6608', // mustard
       stock: 32,
-      imageUrl: img('sweater', 16),
+      images: gallery('sweater', 16),
     },
     {
       name: 'Tailored Chino Trousers',
@@ -86,7 +100,7 @@ async function main() {
       priceInPaise: 189900,
       color: '#BDC3C7', // stone
       stock: 50,
-      imageUrl: img('trousers', 17),
+      images: gallery('trousers', 17),
     },
     {
       name: 'Embroidered Nehru Jacket',
@@ -95,7 +109,7 @@ async function main() {
       priceInPaise: 264900,
       color: '#6C3483', // plum
       stock: 18,
-      imageUrl: img('jacket', 18),
+      images: gallery('jacket', 18),
     },
     {
       name: 'Organic Cotton Tee',
@@ -104,13 +118,13 @@ async function main() {
       priceInPaise: 79900,
       color: '#1C1C1A', // black
       stock: 80,
-      imageUrl: img('tshirt', 19),
+      images: gallery('tshirt', 19),
     },
   ];
 
   for (const p of products) {
     await prisma.product.create({
-      data: { ...p, categoryId: clothing.id },
+      data: { ...p, imageUrl: p.images[0], categoryId: clothing.id },
     });
   }
 

@@ -7,6 +7,7 @@ import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { FindProductsDto } from './dto/find-products.dto';
 import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { slugify } from '../common/strings';
 
@@ -18,6 +19,7 @@ export class ProductsService {
     const { category, search, page, pageSize } = query;
 
     const where: Prisma.ProductWhereInput = {
+      isActive: true,
       ...(category ? { category: { slug: category } } : {}),
       ...(search ? { name: { contains: search, mode: 'insensitive' } } : {}),
     };
@@ -51,6 +53,52 @@ export class ProductsService {
     return this.prisma.category.findMany({ orderBy: { name: 'asc' } });
   }
 
+  /** Admin: all products, active and inactive. */
+  findAllAdmin() {
+    return this.prisma.product.findMany({
+      include: { category: true },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  /** Admin: partially update a product, including deactivating it. */
+  async update(id: string, dto: UpdateProductDto) {
+    const existing = await this.prisma.product.findUnique({ where: { id } });
+    if (!existing) {
+      throw new NotFoundException(`Product "${id}" not found`);
+    }
+
+    let categoryId: string | undefined;
+    if (dto.categorySlug) {
+      const category = await this.prisma.category.findUnique({
+        where: { slug: dto.categorySlug },
+      });
+      if (!category) {
+        throw new BadRequestException(
+          `Category "${dto.categorySlug}" does not exist`,
+        );
+      }
+      categoryId = category.id;
+    }
+
+    return this.prisma.product.update({
+      where: { id },
+      data: {
+        name: dto.name,
+        description: dto.description,
+        priceInPaise: dto.priceInPaise,
+        currency: dto.currency,
+        imageUrl: dto.imageUrl,
+        images: dto.images,
+        color: dto.color,
+        stock: dto.stock,
+        isActive: dto.isActive,
+        categoryId,
+      },
+      include: { category: true },
+    });
+  }
+
   /** Admin: create a product under an existing category. */
   async create(dto: CreateProductDto) {
     const category = await this.prisma.category.findUnique({
@@ -77,6 +125,7 @@ export class ProductsService {
         priceInPaise: dto.priceInPaise,
         currency: dto.currency,
         imageUrl: dto.imageUrl,
+        images: dto.images ?? (dto.imageUrl ? [dto.imageUrl] : []),
         color: dto.color,
         stock: dto.stock,
         categoryId: category.id,

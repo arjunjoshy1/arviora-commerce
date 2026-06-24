@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   Query,
   UseGuards,
@@ -11,6 +12,7 @@ import { Role } from '@prisma/client';
 import { ProductsService } from './products.service';
 import { FindProductsDto } from './dto/find-products.dto';
 import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -32,12 +34,22 @@ export class ProductsController {
     return this.products.listCategories();
   }
 
-  @Get('products/:slug')
-  findOne(@Param('slug') slug: string) {
-    return this.products.findOne(slug);
+  // ---- Admin-only routes (must be declared before "products/:slug" so the
+  // "admin" path segment isn't swallowed as a slug) ----
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @Get('products/admin')
+  findAllAdmin() {
+    return this.products.findAllAdmin();
   }
 
-  // ---- Admin-only routes (require a valid token AND the ADMIN role) ----
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @Patch('products/admin/:id')
+  update(@Param('id') id: string, @Body() dto: UpdateProductDto) {
+    return this.products.update(id, dto);
+  }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
@@ -51,5 +63,12 @@ export class ProductsController {
   @Post('categories')
   createCategory(@Body() dto: CreateCategoryDto) {
     return this.products.createCategory(dto);
+  }
+
+  // ---- Public storefront routes ----
+
+  @Get('products/:slug')
+  findOne(@Param('slug') slug: string) {
+    return this.products.findOne(slug);
   }
 }

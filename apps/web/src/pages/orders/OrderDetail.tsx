@@ -117,12 +117,20 @@ const OrderDetail = () => {
               </div>
             </div>
 
-            <Link
-              to="/"
-              className="mt-8 inline-block text-sm text-muted underline-offset-2 hover:text-ink hover:underline"
-            >
-              ← Continue shopping
-            </Link>
+            <div className="mt-8 flex items-center gap-4">
+              <Link
+                to="/"
+                className="text-sm text-muted underline-offset-2 hover:text-ink hover:underline"
+              >
+                ← Continue shopping
+              </Link>
+              <Link
+                to={`/account?tab=support&orderId=${order.id}`}
+                className="text-sm text-muted underline-offset-2 hover:text-ink hover:underline"
+              >
+                Need help with this order?
+              </Link>
+            </div>
           </>
         )}
       </main>

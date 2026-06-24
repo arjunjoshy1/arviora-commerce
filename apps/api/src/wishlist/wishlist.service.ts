@@ -60,8 +60,10 @@ export function toApiWishlistItem(
       priceInPaise: product.priceInPaise,
       currency: product.currency,
       imageUrl: product.imageUrl,
+      images: product.images,
       color: product.color,
       stock: product.stock,
+      isActive: product.isActive,
       category: {
         id: product.category.id,
         name: product.category.name,

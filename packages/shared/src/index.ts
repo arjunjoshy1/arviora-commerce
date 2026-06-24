@@ -38,12 +38,48 @@ export interface Product {
   priceInPaise: number;
   currency: string;
   imageUrl: string | null;
+  /** Full gallery for the product detail carousel; mirrors [imageUrl] at minimum. */
+  images: string[];
   /** Primary colour as a hex string, shown as a swatch dot. */
   color: string | null;
   stock: number;
+  /** Soft-delete flag; inactive products are hidden from the public catalogue. */
+  isActive: boolean;
   category: Category;
   createdAt: string;
   updatedAt: string;
+}
+
+/** Body for POST /products (admin only). */
+export interface CreateProductRequest {
+  name: string;
+  description?: string;
+  priceInPaise: number;
+  currency?: string;
+  imageUrl?: string;
+  images?: string[];
+  color?: string;
+  stock?: number;
+  categorySlug: string;
+}
+
+/** Body for POST /categories (admin only). */
+export interface CreateCategoryRequest {
+  name: string;
+}
+
+/** Body for PATCH /products/admin/:id (admin only). All fields optional. */
+export interface UpdateProductRequest {
+  name?: string;
+  description?: string;
+  priceInPaise?: number;
+  currency?: string;
+  imageUrl?: string;
+  images?: string[];
+  color?: string;
+  stock?: number;
+  categorySlug?: string;
+  isActive?: boolean;
 }
 
 /** Standard shape for paginated list responses from the API. */
@@ -90,6 +126,14 @@ export interface Order {
   shipping: ShippingAddress;
   items: OrderItem[];
   createdAt: string;
+  /** Present only on admin list responses. */
+  userName?: string;
+  userEmail?: string;
+}
+
+/** Body for PATCH /orders/admin/:id/status (admin only). */
+export interface UpdateOrderStatusRequest {
+  status: OrderStatus;
 }
 
 /** Body for POST /orders — what the client sends to place an order. */
@@ -117,6 +161,42 @@ export interface Address {
   state: string;
   postalCode: string;
   isDefault: boolean;
+}
+
+export type SupportTicketStatus = 'OPEN' | 'IN_PROGRESS' | 'RESOLVED';
+
+/** A customer support ticket raised against a specific order. */
+export interface SupportTicket {
+  id: string;
+  orderId: string;
+  subject: string;
+  message: string;
+  status: SupportTicketStatus;
+  createdAt: string;
+  /** Present only on admin list responses. */
+  userName?: string;
+  userEmail?: string;
+}
+
+/** Body for POST /support — what the client sends to raise a ticket. */
+export interface CreateTicketRequest {
+  orderId: string;
+  subject: string;
+  message: string;
+}
+
+/** Body for PATCH /support/admin/:id/status (admin only). */
+export interface UpdateTicketStatusRequest {
+  status: SupportTicketStatus;
+}
+
+/** Returned by GET /admin/summary — the admin dashboard landing page. */
+export interface AdminSummary {
+  totalProducts: number;
+  totalOrders: number;
+  totalRevenueInPaise: number;
+  openTickets: number;
+  totalUsers: number;
 }
 
 /** A cart line, as stored server-side for a signed-in user. */

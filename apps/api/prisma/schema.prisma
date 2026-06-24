@@ -39,6 +39,7 @@ model User {
   wishlistItems       WishlistItem[]
   cartItems           CartItem[]
   addresses           Address[]
+  supportTickets      SupportTicket[]
 }
 
 model Address {
@@ -102,9 +103,15 @@ model Product {
   priceInPaise Int
   currency     String   @default("INR")
   imageUrl     String?
+  // Full gallery for the product detail carousel; imageUrl mirrors images[0]
+  // as the cover shown in the cart, wishlist, and product grid.
+  images       String[] @default([])
   // Primary colour shown as a swatch dot on the storefront (hex, e.g. "#C0392B").
   color        String?
   stock        Int      @default(0)
+  // Soft-delete flag: deactivated products stay in order history but drop off
+  // the storefront and public catalogue.
+  isActive     Boolean  @default(true)
 
   categoryId String
   category   Category @relation(fields: [categoryId], references: [id])
@@ -173,7 +180,8 @@ model Order {
   shippingState      String
   shippingPostalCode String
 
-  items OrderItem[]
+  items          OrderItem[]
+  supportTickets SupportTicket[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -195,5 +203,29 @@ model OrderItem {
   size         String
   quantity     Int
 
+  @@index([orderId])
+}
+
+enum SupportTicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+}
+
+model SupportTicket {
+  id      String @id @default(cuid())
+  userId  String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  subject String
+  message String
+  status  SupportTicketStatus @default(OPEN)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
   @@index([orderId])
 }
